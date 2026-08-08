@@ -57,7 +57,7 @@ export function Sidebar() {
         </h1>
       </div>
 
-      <nav className='px-3'>
+      <nav aria-label="Primary navigation" className='px-3'>
         {navigation.map((item) => {
           const { label, icon, href } = item;
           const Icon = icon;
@@ -68,6 +68,7 @@ export function Sidebar() {
             <Link 
               key={href}
               href={href}
+              aria-current={isActive ? 'page' : undefined}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                 isActive 
                 ? 'bg-slate-900 font-medium text-white' 
