@@ -51,16 +51,17 @@ export function Sidebar() {
 
       <nav className='px-3'>
         {navigation.map((item) => {
-          const Icon = item.icon;
+          const { label, icon, href } = item;
+          const Icon = icon;
 
           return (
             <a 
-              key={item.href}
-              href={item.href}
+              key={href}
+              href={href}
               className='flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950'
             >
               <Icon className='w-5 h-5 text-slate-500' />
-              {item.label}
+              {label}
             </a>
           );
         })}
