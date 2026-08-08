@@ -1,13 +1,12 @@
+import { PageHeader } from "@/components/ui/page-header";
+
 export default function LocationsPage() {
   return (
     <section className="p-4 sm:p-6 md:p-8">
-      <h1 className="text-3xl font-bold text-slate-950">
-        Locations
-      </h1>
-
-      <p className="mt-2 text-slate-600">
-        Monitor weather and environmental information by location.
-      </p>
+      <PageHeader
+        title="Locations"
+        description="Monitor weather and environmental information by location."
+      />
     </section>
   );
 }

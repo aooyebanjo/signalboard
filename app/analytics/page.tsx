@@ -1,13 +1,12 @@
+import { PageHeader } from "@/components/ui/page-header";
+
 export default function AnalyticsPage() {
   return (
     <section className="p-4 sm:p-6 md:p-8">
-      <h1 className="text-3xl font-bold text-slate-950">
-        Analytics
-      </h1>
-
-      <p className="mt-2 text-slate-600">
-        Analyze trends and derived intelligence from application data.
-      </p>
+      <PageHeader
+        title="Analytics"
+        description="Analyze trends and derived intelligence from application data."
+      />
     </section>
   );
 }
