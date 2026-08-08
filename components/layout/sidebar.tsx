@@ -50,7 +50,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className='w-64 border-r border-slate-200 bg-white'>
+    <aside className='hidden w-64 border-r border-slate-200 bg-white md:block'>
       <div className='p-6'>
         <h1 className='text-xl font-bold text-slate-900'>
           SignalBoard

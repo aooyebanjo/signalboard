@@ -1,6 +1,6 @@
 export default function BookmarksPage() {
   return (
-    <section className="p-8">
+    <section className="p-4 sm:p-6 md:p-8">
       <h1 className="text-3xl font-bold text-slate-950">
         Bookmarks
       </h1>

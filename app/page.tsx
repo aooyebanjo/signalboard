@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function DashboardPage() {
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">
           Dashboard
