@@ -27,7 +27,7 @@ export default function RootLayout({
     <html>
       <body>
         <AppShell>
-          {children}
+          {children} {/* The main content from page.tsx */}
         </AppShell>
       </body>
     </html>
