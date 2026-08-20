@@ -3,6 +3,7 @@ import { z } from "zod";
 import { hackerNewsStorySchema, type HackerNewsStory } from "../schemas/hacker-news-story.schema";
 import type { Story } from "../types/story .ts";
 import { mapHackerNewsStory } from "../utils/map-hacker-news-story";
+import { ApiError, NotFoundError } from "@/lib/error";
 
 /** Base URL for the public Hacker News Firebase API. */
 const HACKER_NEWS_API_URL =
@@ -21,11 +22,14 @@ export async function getTopStoryIds(): Promise<number[]> {
   );
 
   if (!response.ok) {
-    throw new Error(
-      `Unable to retrieve top stories: ${response.status}`
+    // If the response is not ok, throw an ApiError with the status code
+    throw new ApiError(
+      `Unable to retrieve top stories`,
+      response.status,
     );
   }
 
+  // Parse the response body as JSON
   const data: unknown = await response.json();
 
   // Runtime-validate before treating the payload as number[].
@@ -43,12 +47,22 @@ export async function getStory(
   );
 
   if (!response.ok) {
-    throw new Error(
-      `Unable to retrieve story ${id}: ${response.status}`
+    // If the response is not ok, throw an ApiError with the status code
+    throw new ApiError(
+      `Unable to retrieve story ${id}}`,
+      response.status,
     );
   }
 
+  // Parse the response body as JSON
   const data: unknown = await response.json();
+
+  if (data === null) {
+    // If the data is null, throw a NotFoundError
+    throw new NotFoundError(
+      `Story ${id} was not found`
+    );
+  }
 
   // Ensure the HN payload matches the expected item shape.
   const hackerNewsStory: HackerNewsStory =
