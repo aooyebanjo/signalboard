@@ -3,7 +3,14 @@ import { describe, expect, it } from "vitest";
 import { mapHackerNewsStory } from "./map-hacker-news-story";
 import type { HackerNewsStory } from "../schemas/hacker-news-story.schema";
 
+/**
+ * Tests for the mapHackerNewsStory function.
+ */
 describe("mapHackerNewsStory", () => {
+  /**
+   * Maps a Hacker News story into a SignalBoard Story object,
+   * including the comment count.
+   */
   it("maps a Hacker News story into a SignalBoard Story", () => {
     const hackerNewsStory: HackerNewsStory = {
       id: 12345,
@@ -16,9 +23,11 @@ describe("mapHackerNewsStory", () => {
       type: "story",
     };
 
+    // Map the Hacker News story into a SignalBoard Story object
     const result =
       mapHackerNewsStory(hackerNewsStory);
 
+    // Expect the result to be a SignalBoard Story object with the correct properties
     expect(result).toEqual({
       id: 12345,
       title: "An interesting technology story",
@@ -32,6 +41,9 @@ describe("mapHackerNewsStory", () => {
     });
   });
 
+  /**
+   * Uses zero comments when descendants is missing.
+   */
   it("uses zero comments when descendants is missing", () => {
     const hackerNewsStory: HackerNewsStory = {
       id: 12345,
@@ -41,10 +53,12 @@ describe("mapHackerNewsStory", () => {
       time: 1_700_000_000,
       type: "story",
     };
-  
+
+    // Map the Hacker News story into a SignalBoard Story object
     const result =
       mapHackerNewsStory(hackerNewsStory);
-  
+    
+    // Expect the result to be a SignalBoard Story object with the correct properties
     expect(result.commentCount).toBe(0);
   });
 });

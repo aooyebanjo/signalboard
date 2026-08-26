@@ -19,14 +19,24 @@ import {
 import { TechnologyStories } from "./technology-strories";
 import { getStories } from "../api/stories";
 
+/**
+ * Mock the getStories function.
+ */
 vi.mock("../api/stories", () => ({
   getStories: vi.fn(),
 }));
 
+/**
+ * The mocked getStories function.
+ */
 const mockedGetStories =
   vi.mocked(getStories);
 
+/**
+ * Renders the TechnologyStories component.
+ */
 function renderTechnologyStories() {
+  // Create a query client
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -35,6 +45,7 @@ function renderTechnologyStories() {
     },
   });
 
+  // Render the TechnologyStories component
   return render(
     <QueryClientProvider client={queryClient}>
       <TechnologyStories />
@@ -42,14 +53,25 @@ function renderTechnologyStories() {
   );
 }
 
+/**
+ * Tests for the TechnologyStories component.
+ */
 describe("TechnologyStories", () => {
+  /**
+   * Clear all mocks before each test.
+   */
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  /**
+   * Loads another page of stories when Load more is clicked.
+   */
   it("loads another page of stories when Load more is clicked", async () => {
+    // Set up the user event
     const user = userEvent.setup();
 
+    // Mock the getStories function to return the stories
     mockedGetStories
       .mockResolvedValueOnce({
         data: [
@@ -103,27 +125,34 @@ describe("TechnologyStories", () => {
         },
       });
 
+    // Render the TechnologyStories component
     renderTechnologyStories();
 
+    // Expect the first story to be in the document
     expect(
       await screen.findByText("Story One")
     ).toBeInTheDocument();
 
+    // Expect the second story to be in the document
     expect(
       screen.getByText("Story Two")
     ).toBeInTheDocument();
 
+    // Get the Load more button
     const loadMoreButton =
       screen.getByRole("button", {
         name: /load more/i,
       });
 
+    // Click the Load more button
     await user.click(loadMoreButton);
 
+    // Expect the third story to be in the document
     expect(
       await screen.findByText("Story Three")
     ).toBeInTheDocument();
 
+    // Expect the getStories function to have been called with the correct arguments
     await waitFor(() => {
       expect(mockedGetStories)
         .toHaveBeenNthCalledWith(
@@ -140,6 +169,7 @@ describe("TechnologyStories", () => {
         );
     });
 
+    // Expect the end of the list message to be in the document
     expect(
       screen.getByText(
         "You've reached the end of the list."
@@ -147,9 +177,14 @@ describe("TechnologyStories", () => {
     ).toBeInTheDocument();
   });
 
+  /**
+   * Shows an error state and retries successfully.
+   */
   it("shows an error state and retries successfully", async () => {
+    // Set up the user event
     const user = userEvent.setup();
   
+    // Mock the getStories function to return an error
     mockedGetStories
       .mockRejectedValueOnce(
         new Error("Network failure")
@@ -174,31 +209,38 @@ describe("TechnologyStories", () => {
           hasMore: false,
         },
       });
-  
+
+    // Render the TechnologyStories component
     renderTechnologyStories();
   
+    // Expect the error message to be in the document
     expect(
       await screen.findByText(
         "Unable to load stories"
       )
     ).toBeInTheDocument();
-  
+
+    // Get the Retry button
     const retryButton =
       screen.getByRole("button", {
         name: /try again/i,
       });
-  
+
+    // Click the Retry button
     await user.click(retryButton);
-  
+
+    // Expect the recovered story to be in the document
     expect(
       await screen.findByText(
         "Recovered Story"
       )
     ).toBeInTheDocument();
-  
+
+    // Expect the getStories function to have been called twice
     expect(mockedGetStories)
       .toHaveBeenCalledTimes(2);
-  
+
+    // Expect the error message to not be in the document
     expect(
       screen.queryByText(
         "Unable to load stories"

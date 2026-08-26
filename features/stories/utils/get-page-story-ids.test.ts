@@ -6,7 +6,13 @@ import {
 
 import { getPageStoryIds } from "./get-page-story-ids";
 
+/**
+ * Tests for the getPageStoryIds function.
+ */
 describe("getPageStoryIds", () => {
+  /**
+   * The story IDs to test.
+   */
   const storyIds = [
     101,
     102,
@@ -22,6 +28,9 @@ describe("getPageStoryIds", () => {
     112,
   ];
 
+  /**
+   * Returns the first page of story IDs.
+   */
   it("returns the first page of story IDs", () => {
     const result = getPageStoryIds(
       storyIds,
@@ -29,6 +38,7 @@ describe("getPageStoryIds", () => {
       0
     );
 
+    // Expect the result to be the first page of story IDs
     expect(result).toEqual([
       101,
       102,
@@ -38,6 +48,9 @@ describe("getPageStoryIds", () => {
     ]);
   });
 
+  /**
+   * Returns the second page of story IDs.
+   */
   it("returns the second page of story IDs", () => {
     const result = getPageStoryIds(
       storyIds,
@@ -45,6 +58,7 @@ describe("getPageStoryIds", () => {
       5
     );
 
+    // Expect the result to be the second page of story IDs
     expect(result).toEqual([
       106,
       107,
@@ -54,6 +68,9 @@ describe("getPageStoryIds", () => {
     ]);
   });
 
+  /**
+   * Returns only the remaining IDs on the final page.
+   */
   it("returns only the remaining IDs on the final page", () => {
     const result = getPageStoryIds(
       storyIds,
@@ -61,19 +78,25 @@ describe("getPageStoryIds", () => {
       10
     );
 
+    // Expect the result to be the remaining IDs on the final page
     expect(result).toEqual([
       111,
       112,
     ]);
   });
 
+  /**
+   * Returns an empty array when the offset is beyond the available IDs.
+   */
   it("returns an empty array when the offset is beyond the available IDs", () => {
+    // Get the remaining IDs on the final page
     const result = getPageStoryIds(
       storyIds,
       5,
       50
     );
 
+    // Expect the result to be an empty array
     expect(result).toEqual([]);
   });
 });
