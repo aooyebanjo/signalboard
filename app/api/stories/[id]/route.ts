@@ -2,6 +2,7 @@ import { z } from "zod";
 import { getStory } from "@/features/stories/api/hacker-news";
 import { ApiError, NotFoundError } from "@/lib/error";
 import { createApiErrorResponse, ApiErrorCode } from "@/lib/api-error";
+import type { Story } from "@/features/stories/types/story .ts";
 
 const paramsSchema = z.object({
   id: z.coerce.number().int().positive(),
@@ -31,7 +32,7 @@ export async function GET(request: Request, context: StoryRouteContext) {
     }
 
     // If the story ID is valid, retrieve the story from the Hacker News API
-    const story = await getStory(result.data.id);
+    const story: Story = await getStory(result.data.id);
 
     // Return the story as a JSON response
     return Response.json(story);

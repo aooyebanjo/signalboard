@@ -1,10 +1,10 @@
-import Image from "next/image";
+// import Image from "next/image";
 import { 
   Card, 
   CardHeader, 
   CardTitle, 
   CardDescription, 
-  CardContent, 
+  // CardContent, 
 } from "@/components/ui/card";
 
 import { PageHeader } from "@/components/ui/page-header";

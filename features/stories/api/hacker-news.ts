@@ -1,9 +1,13 @@
+// This file is server-only, so it cannot be imported into the client side
+import "server-only";
+
 import { z } from "zod";
 
 import { hackerNewsStorySchema, type HackerNewsStory } from "../schemas/hacker-news-story.schema";
 import type { Story } from "../types/story .ts";
 import { mapHackerNewsStory } from "../utils/map-hacker-news-story";
 import { ApiError, NotFoundError } from "@/lib/error";
+import { getPageStoryIds } from "../utils/get-page-story-ids";
 
 /** Base URL for the public Hacker News Firebase API. */
 const HACKER_NEWS_API_URL =
@@ -77,13 +81,18 @@ export async function getStory(
  * Throws if the request fails or the response shape is unexpected.
  */
 export async function getTopStories(
-  limit = 20
+  limit = 20,
+  offset = 0
 ): Promise<Story[]> {
   // Fetch the top story IDs
   const storyIds: number[] = await getTopStoryIds();
 
-  // Select the top stories
-  const selectedIds: number[] = storyIds.slice(0, limit);
+  // Select the top stories, using the offset and limit to select the stories, this is used to paginate the stories
+  // const selectedIds: number[] = storyIds.slice(
+  //   offset, 
+  //   offset + limit
+  // );
+  const selectedIds: number[] = getPageStoryIds(storyIds, limit, offset);
 
   // Fetch the stories
   const storyPromises: Promise<Story>[] = selectedIds.map((id) =>

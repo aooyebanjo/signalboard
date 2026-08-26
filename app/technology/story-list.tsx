@@ -1,4 +1,4 @@
-import { StoryCard } from "@/features/stories/compoents/story-card";
+import { StoryCard } from "@/features/stories/components/story-card";
 
 import type { Story } from "@/features/stories/types/story .ts";
 

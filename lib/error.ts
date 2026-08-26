@@ -1,7 +1,10 @@
+import type { ApiErrorCode } from "./api-error";
+
 export class ApiError extends Error {
   constructor(
     message: string,
-    public status?: number
+    public status?: number,
+    public code?: ApiErrorCode
   ) {
     super(message);
 
