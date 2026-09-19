@@ -7,6 +7,7 @@ import {
   Compass, 
   House, 
   Newspaper,
+  Users,
 } from 'lucide-react';
 
 import Link from 'next/link';
@@ -23,6 +24,11 @@ const navigation = [
     label: 'Discover',
     icon: Compass,
     href: '/discover',
+  },
+  {
+    label: 'Developers',
+    icon: Users,
+    href: '/developers',
   },
   {
     label: 'Technology',
