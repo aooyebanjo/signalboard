@@ -104,6 +104,34 @@ Locations includes unit and integration tests using Vitest and React Testing Lib
 | Lucide React | UI icons |
 | date-fns | Date formatting and manipulation |
 
+## Data & API Architecture
+
+SignalBoard uses Next.js API route handlers as an application boundary between the browser and external services.
+
+For example, Technology stories follow this request flow:
+
+```text
+React UI
+   ↓
+TanStack Query
+   ↓
+SignalBoard API client
+   ↓
+Next.js API route
+   ↓
+External Hacker News API
+   ↓
+Runtime validation and data mapping
+   ↓
+SignalBoard domain model
+   ↓
+Validated API response
+   ↓
+TanStack Query cache
+   ↓
+React UI
+```
+
 ## Architecture
 
 SignalBoard uses a feature-oriented architecture that separates application routing, shared UI, feature-specific logic, data access, runtime validation, and reusable infrastructure.
@@ -140,37 +168,6 @@ features/
     ├── schemas/
     ├── types/
     └── utils/
-
-
-
-
-## Data & API Architecture
-
-SignalBoard uses Next.js API route handlers as an application boundary between the browser and external services.
-
-For example, Technology stories follow this request flow:
-
-```text
-React UI
-   ↓
-TanStack Query
-   ↓
-SignalBoard API client
-   ↓
-Next.js API route
-   ↓
-External Hacker News API
-   ↓
-Runtime validation and data mapping
-   ↓
-SignalBoard domain model
-   ↓
-Validated API response
-   ↓
-TanStack Query cache
-   ↓
-React UI
-```
 
 External API responses are treated as untrusted data and validated at runtime with Zod before being mapped into application-specific domain models. API responses consumed by the client are also validated before being used by the UI.
 
