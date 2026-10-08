@@ -142,6 +142,8 @@ features/
     └── utils/
 
 
+
+
 ## Data & API Architecture
 
 SignalBoard uses Next.js API route handlers as an application boundary between the browser and external services.
