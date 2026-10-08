@@ -36,6 +36,59 @@ Key capabilities include:
 - Runtime API response validation
 - Loading and error-state handling
 
+## Locations & Interactive Maps
+
+The Locations feature provides geographic search and interactive map exploration using Geoapify and MapLibre GL JS.
+
+### Features
+
+- **Location autocomplete:** Search for cities and geographic locations using Geoapify.
+- **Interactive maps:** Display selected locations with MapLibre GL JS, including markers, navigation controls, and animated map transitions.
+- **Map-click selection:** Select a new geographic point directly from the map.
+- **Reverse geocoding:** Resolve latitude and longitude coordinates into location information.
+- **Shareable URLs:** Persist selected coordinates in the URL, allowing locations to be restored after refreshing or opening a shared link.
+- **Caching:** Use TanStack Query to cache location searches and coordinate lookups, including cache seeding after autocomplete selection.
+- **Loading and error handling:** Display loading indicators, accessible error messages, and retry controls when reverse geocoding fails.
+- **Accessibility:** Provide keyboard-accessible autocomplete, appropriate ARIA roles, and status announcements.
+
+### Architecture
+
+The Locations feature follows the same layered architecture as the rest of SignalBoard:
+
+```text
+Geoapify API
+    ↓
+Server-only integration
+    ↓
+Zod response validation
+    ↓
+Domain model mapping
+    ↓
+Next.js API routes
+    ↓
+Client API and validation
+    ↓
+TanStack Query hooks
+    ↓
+React components and MapLibre
+```
+
+Geoapify API credentials remain on the server and are not exposed to browser-side code.
+
+### Testing
+
+Locations includes unit and integration tests using Vitest and React Testing Library, covering:
+
+- Coordinate parsing and validation
+- Autocomplete search and selection
+- TanStack Query cache seeding
+- URL synchronization and shareable links
+- Map-click coordinate selection
+- Location restoration from URL coordinates
+- Invalid coordinate handling
+- Loading and error states
+- Retry behavior after reverse-geocoding failures
+
 ## Technology Stack
 
 | Technology | Purpose |
@@ -71,6 +124,14 @@ features/
 │   ├── components/
 │   ├── hooks/
 │   ├── schemas/
+│   ├── types/
+│   └── utils/
+├── locations/
+│   ├── api/
+│   ├── components/
+│   ├── hooks/
+│   ├── schemas/
+│   ├── test/
 │   ├── types/
 │   └── utils/
 └── stories/
@@ -293,7 +354,13 @@ A useful starting account for testing is:
 
 | Username | Notes |
 | --- | --- |
-| `octocat` | GitHub's well-known example/test account used throughout GitHub's API documentation |
+| `octocat` | GitHub's well-known example/test account |
+| `travolis` | Public GitHub account previously used while testing SignalBoard's Developer feature |
+| `gaearon` | Public developer account with numerous repositories |
+| `sindresorhus` | Public developer account with a large number of open-source repositories |
+| `tj` | Public developer account with extensive open-source activity |
+| `addyosmani` | Public developer account with web-development projects |
+| `kentcdodds` | Public developer account with JavaScript and web-development projects |
 
 You can also test the feature with other valid public GitHub usernames.
 
