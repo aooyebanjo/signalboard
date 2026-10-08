@@ -168,6 +168,7 @@ features/
     ├── schemas/
     ├── types/
     └── utils/
+```
 
 External API responses are treated as untrusted data and validated at runtime with Zod before being mapped into application-specific domain models. API responses consumed by the client are also validated before being used by the UI.
 
