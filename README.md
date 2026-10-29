@@ -36,11 +36,11 @@ Key capabilities include:
 - Runtime API response validation
 - Loading and error-state handling
 
-## Locations & Interactive Maps
+### Locations & Interactive Maps
 
 The Locations feature provides geographic search and interactive map exploration using Geoapify and MapLibre GL JS.
 
-### Features
+## Features
 
 - **Location autocomplete:** Search for cities and geographic locations using Geoapify.
 - **Interactive maps:** Display selected locations with MapLibre GL JS, including markers, navigation controls, and animated map transitions.
@@ -50,6 +50,30 @@ The Locations feature provides geographic search and interactive map exploration
 - **Caching:** Use TanStack Query to cache location searches and coordinate lookups, including cache seeding after autocomplete selection.
 - **Loading and error handling:** Display loading indicators, accessible error messages, and retry controls when reverse geocoding fails.
 - **Accessibility:** Provide keyboard-accessible autocomplete, appropriate ARIA roles, and status announcements.
+
+### Analytics Dashboard
+
+Explore Hacker News engagement metrics and GitHub repository statistics through an interactive analytics dashboard.
+
+The Analytics feature combines data from the Hacker News and GitHub REST APIs, performs server-side aggregation, and presents the results through reusable metric cards and Recharts visualizations.
+
+Key capabilities include:
+
+- Dynamic GitHub username selection with URL-based navigation.
+- Shareable URLs such as `/analytics?username=octocat`.
+- Hacker News metrics, including total stories, total scores, total comments, average score, and average comments.
+- GitHub repository metrics, including total repositories, stars, and forks.
+- Repository programming-language distribution displayed in a horizontal bar chart.
+- Hacker News average engagement displayed in a bar chart.
+- Server-side aggregation and runtime validation using Zod.
+- TanStack Query caching, background refresh, and manual refresh.
+- Request cancellation using `AbortSignal`.
+- Loading, error, empty-data, and retry states.
+- Responsive layouts and accessible chart data representations.
+
+The dashboard uses a sample of recent Hacker News top stories and retrieves GitHub repositories through paginated API requests.
+
+Analytics are calculated from the retrieved datasets and are not intended to represent historical trends.
 
 ### Architecture
 
@@ -103,6 +127,7 @@ Locations includes unit and integration tests using Vitest and React Testing Lib
 | React Testing Library | Component testing and user-focused UI testing |
 | Lucide React | UI icons |
 | date-fns | Date formatting and manipulation |
+| Recharts | Responsive data visualizations for analytics |
 
 ## Architecture
 
@@ -119,6 +144,14 @@ signalboard/
 └── test/         # Test configuration and shared test infrastructure
 
 features/
+├── analytics/
+│   ├── api/
+│   ├── components/
+│   ├── hooks/
+│   ├── schemas/
+│   ├── test/
+│   ├── types/
+│   └── utils/
 ├── developers/
 │   ├── api/
 │   ├── components/
@@ -176,6 +209,58 @@ This approach keeps third-party API structures from leaking directly into presen
 
 Server-only integrations are explicitly isolated from client-side code, while shared API error handling provides consistent responses for validation failures, unavailable upstream services, and unexpected errors.
 
+### Analytics Data Pipeline
+
+The Analytics feature uses a Next.js API route to aggregate data from two external services.
+
+```text
+Analytics Dashboard
+        |
+        v
+useAnalytics(username)
+        |
+        v
+TanStack Query
+        |
+        v
+GET /api/analytics?username=octocat
+        |
+        +-----------------------------+
+        |                             |
+        v                             v
+Hacker News API                 GitHub REST API
+        |                             |
+        v                             v
+Top Stories                     Public Repositories
+        |                             |
+        +---------------+-------------+
+                        |
+                        v
+               Metrics Calculation
+                        |
+                        v
+                 Zod Validation
+                        |
+                        v
+                AnalyticsOverview
+                        |
+                        v
+               Recharts + Metric Cards
+```
+
+The API route fetches Hacker News stories and GitHub repositories concurrently using `Promise.all()`.
+
+Dedicated utility functions calculate:
+
+- Story engagement totals and averages.
+- Repository totals, stars, and forks.
+- Repository language distribution.
+
+The resulting `AnalyticsOverview` object is validated with Zod before being returned to the client.
+
+The client API validates the response again before the data reaches the dashboard.
+
+This architecture separates external API integration, business logic, data validation, server-state management, and presentation.
 
 ## Data Fetching, Caching & Prefetching
 
@@ -205,6 +290,35 @@ Story List
 
 These strategies allow the UI to reuse data that has already been retrieved while still allowing TanStack Query to determine when cached data should be refreshed.
 
+### Analytics Caching and Request Cancellation
+
+The Analytics dashboard uses TanStack Query to manage asynchronous data fetching and caching.
+
+Each GitHub username has a separate query cache entry.
+
+For example:
+
+```ts
+["analytics", "overview", "octocat"]
+["analytics", "overview", "torvalds"]
+```
+
+The query configuration includes:
+
+| Configuration | Value | Purpose |
+| --- | --- | --- |
+| `staleTime` | 5 minutes | Keeps successfully fetched analytics fresh |
+| `gcTime` | 15 minutes | Retains inactive queries before garbage collection |
+| `refetchOnWindowFocus` | `false` | Avoids automatic requests when returning to the browser tab |
+| `retry` | Conditional | Avoids retrying known validation and missing-resource errors |
+
+Users can manually refresh analytics without navigating away from the dashboard.
+
+The query function also consumes the `AbortSignal` provided by TanStack Query and forwards it to the browser's `fetch()` request.
+
+This allows obsolete client-side requests to be cancelled when the associated query is cancelled.
+
+Client-side cancellation does not necessarily stop upstream processing already running in the Next.js API route.
 
 ## Runtime Validation & Type Safety
 
@@ -221,6 +335,24 @@ This provides two complementary layers of protection:
 
 Keeping external API models separate from internal application models also allows SignalBoard to normalize third-party data before it reaches UI components.
 
+### Analytics Validation and Error Handling
+
+The Analytics feature uses Zod to validate GitHub usernames, API query parameters, and analytics response structures.
+
+A shared GitHub username schema keeps client-side and server-side validation consistent.
+
+The application distinguishes between different failure scenarios, including:
+
+- Invalid GitHub usernames.
+- GitHub accounts that do not exist.
+- External API failures.
+- Unexpected server errors.
+
+A typed `AnalyticsApiError` preserves HTTP status information so TanStack Query can apply an appropriate retry strategy.
+
+The dashboard displays descriptive error messages and provides a retry action.
+
+External API credentials remain on the server and are not exposed to client-side components.
 
 ## Testing
 
@@ -245,7 +377,75 @@ or as a single non-watch run:
 ```bash
 npm run test:run
 
+### Analytics Tests
+
+The Analytics feature includes unit, component, client API, and route-handler tests.
+
+Test coverage includes:
+
+- Story metrics calculations.
+- Developer repository metrics calculations.
+- Programming-language distribution calculations.
+- Story engagement chart data transformations.
+- Metric card rendering.
+- Chart rendering and empty states.
+- Analytics dashboard loading, success, error, retry, and background refresh states.
+- GitHub username validation and form submission.
+- Client API response validation and HTTP error handling.
+- `AbortSignal` forwarding.
+- Analytics API route validation and aggregation.
+
+External API calls and TanStack Query hooks are mocked where appropriate to keep tests deterministic.
+
+Run the Analytics tests:
+
+```bash
+npx vitest run features/analytics
+```
+
+Run the Analytics API route tests:
+
+```bash
+npx vitest run app/api/analytics
+```
+
+Run all project tests:
+
+```bash
+npm run test:run
+```
+
 ## Getting Started
+
+### Using the Analytics Dashboard
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Open the Analytics page:
+
+```text
+http://localhost:3000/analytics
+```
+
+The dashboard uses `octocat` as the default GitHub username.
+
+To analyze another developer, enter a valid GitHub username and select **Analyze**.
+
+The selected username is reflected in the URL:
+
+```text
+http://localhost:3000/analytics?username=torvalds
+```
+
+This makes analytics views bookmarkable and shareable.
+
+The dashboard displays Hacker News engagement metrics alongside repository statistics for the selected GitHub developer.
+
+The GitHub repository metrics depend on publicly available repository data and the external API's availability and rate limits.
 
 ### Prerequisites
 
@@ -355,7 +555,7 @@ A useful starting account for testing is:
 | Username | Notes |
 | --- | --- |
 | `octocat` | GitHub's well-known example/test account |
-| `travolis` | Public GitHub account previously used while testing SignalBoard's Developer feature |
+| `torvalds` | Public GitHub account previously used while testing SignalBoard's Developer feature |
 | `gaearon` | Public developer account with numerous repositories |
 | `sindresorhus` | Public developer account with a large number of open-source repositories |
 | `tj` | Public developer account with extensive open-source activity |
